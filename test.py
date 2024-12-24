@@ -3,19 +3,14 @@ import numpy as np
 import seaborn as sns
 import getpass as getpass
 
-roles_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/roles.csv'
-characters_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/characters.csv'
-players_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/players.csv'
-maps_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/maps.csv'
-gamemodes_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/gamemodes.csv'
-gameDetail_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/gameDetails.csv'
+roles_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/roles.csv'
+characters_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/characters.csv'
+players_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/players.csv'
+maps_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/maps.csv'
+gamemodes_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/gamemodes.csv'
+gameDetail_path = 'C:/Users/Trey Muraoka/Documents/Coding Projects/Marvels Rivals/Git/gameDetails.csv'
 
-roles = pd.read_csv(roles_path)
-characters = pd.read_csv(characters_path)
-players = pd.read_csv(players_path)
-maps = pd.read_csv(maps_path)
-gamemodes = pd.read_csv(gamemodes_path)
-game_detail = pd.read_csv(gameDetail_path)
+# Other functions
 
 def calculate_k_d(db, player_id):
     player_data = db[db['player_id'] == player_id]
@@ -48,10 +43,11 @@ def calculate_losses(db, player_id):
         total_loss = player_data['loss'].sum()
         return total_loss
 
-def add_player(username):
-    existing_ids = players['ID']
+# Add Functions
+def add_player(db, username):
+    existing_ids = db['ID']
     
-    if username in players['name'].values:
+    if username in db['name'].values:
         print(f'{username} already exists!')
     
     else:
@@ -67,55 +63,68 @@ def add_player(username):
         new_player = pd.Series({'ID': new_id, 'name': username})
         
         # Concatenate the new player row to the existing DataFrame
-        players = pd.concat([players, new_player.to_frame().T], ignore_index=True)
+        players = pd.concat([db, new_player.to_frame().T], ignore_index=True)
 
         players.to_csv(players_path, index=False)
 
         print(f'{username} has been added!')
 
-def delete_player(username):
-    existing_users = players['name']
+# Delete Functions
+def delete_player(db, username):
+    existing_users = db['name']
 
     if username not in existing_users.values:
         print(f'{username} does not exist!')
     else:
         # Filter out the player to be deleted
-        new_players = players[players['name'] != username]
+        new_players = db[db['name'] != username]
         
         # Check if the number of rows changed
-        if new_players.shape[0] == players.shape[0]:
+        if new_players.shape[0] == db.shape[0]:
             print("Player not found, no deletion occurred.")
         else:
             print(f'{username} has been found and deleted.')
             new_players.to_csv(players_path, index=False)
 
+# View Functions
+def view_player(db, id, username):
 
-def view_player(username):
-    player_info = players[players['name'] == username]
-    
-    if player_info.empty:
-        return 'Player could not be found!'
-    else:
-        return player_info
+    if id == '' and username == '':
+        print(db)
+    elif id:
+        player_info = db[db['ID'] == id]
+        if player_info.empty:
+            return 'Player could not be found!'
+        else:
+            return player_info
+        
+    elif username:
+        player_info = db[db['name'] == username]
+        
+        if player_info.empty:
+            return 'Player could not be found!'
+        else:
+            return player_info
 
 # Main
+
+roles = pd.read_csv(roles_path)
+characters = pd.read_csv(characters_path)
+players = pd.read_csv(players_path)
+maps = pd.read_csv(maps_path)
+gamemodes = pd.read_csv(gamemodes_path)
+game_detail = pd.read_csv(gameDetail_path)
 
 menu_1 = 0
 while menu_1!= 4:
     print('Welcome to Marvels Rivals API\nSelect From Options Below:\n1. Add\n2. Delete\n3. View\n4. Exit')
     menu_1 = int(input('Enter ==> '))
-    roles = pd.read_csv(roles_path)
-    characters = pd.read_csv(characters_path)
-    players = pd.read_csv(players_path)
-    maps = pd.read_csv(maps_path)
-    gamemodes = pd.read_csv(gamemodes_path)
-    game_detail = pd.read_csv(gameDetail_path)
     if menu_1 == 1:
         print('1. Add Player\n2. Add Role\n3. Add Character\n4. Add Map\n5. Add Mode\n6. Add Game Performance Detail')
         add_choice = int(input('Enter ==> '))
         if add_choice == 1:
             username = input('Enter New Player Username ==> ')
-            add_player(username=username)
+            add_player(db=players, username=username)
             pause = getpass.getpass('Hit Enter to Advance to Main Menu...')
         elif add_choice == 2:
             print()
@@ -133,7 +142,7 @@ while menu_1!= 4:
         delete_choice = int(input('Enter ==> '))
         if delete_choice == 1:
             username = input('Enter New Player Username ==> ')
-            delete_player(username=username)
+            delete_player(db=players, username=username)
             pause = getpass.getpass('Hit Enter to Advance to Main Menu...')
         elif delete_choice == 2:
             print()
@@ -150,8 +159,16 @@ while menu_1!= 4:
         print('1. View Player\n2. View Role\n3. View Character\n4. View Map\n5. View Mode\n6. View Game Performance Detail')
         view_choice = int(input('Enter ==> '))
         if view_choice == 1:
-            username = input('Enter Player Username ==>')
-            print(view_player(username=username))
+            print('1. See All Players\n2. Lookup by Player ID\n3. Lookup by Username')
+            player_view = int(input('Enter == > '))
+            if player_view == 1:
+                print(view_player(db=players, id='', username=''))
+            elif player_view == 2:
+                player_id = input('Enter Player ID ==>')
+                print(view_player(db=players, id=player_id, username=''))
+            elif player_view == 3:
+                username = input('Enter Player Username ==>')
+                print(view_player(db=players, id='', username=username))
             pause = getpass.getpass('Hit Enter to Advance to Main Menu...')
         elif view_choice == 2:
             print()
