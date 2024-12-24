@@ -70,20 +70,29 @@ def add_player(db, username):
         print(f'{username} has been added!')
 
 # Delete Functions
-def delete_player(db, username):
+def delete_player(db, id, username):
     existing_users = db['name']
+    existing_ids = db['ID']
 
-    if username not in existing_users.values:
-        print(f'{username} does not exist!')
-    else:
-        # Filter out the player to be deleted
-        new_players = db[db['name'] != username]
-        
-        # Check if the number of rows changed
-        if new_players.shape[0] == db.shape[0]:
-            print("Player not found, no deletion occurred.")
+    if username:
+        if username not in existing_users.values:
+            print(f'{username} does not exist!')
         else:
-            print(f'{username} has been found and deleted.')
+            # Filter out the player to be deleted
+            new_players = db[db['name'] != username]
+            
+            # Check if the number of rows changed
+            if new_players.shape[0] == db.shape[0]:
+                print("Player not found, no deletion occurred.")
+            else:
+                print(f'{username} has been found and deleted.')
+                new_players.to_csv(players_path, index=False)
+    elif id:
+        new_players = db[db['ID'] != id]
+        if id not in existing_ids.values:
+            print(f'User {id} does not exist!')
+        else:
+            print(f'User {id} has been found and deleted.')
             new_players.to_csv(players_path, index=False)
 
 # View Functions
@@ -141,8 +150,14 @@ while menu_1!= 4:
         print('1. Delete Player\n2. Delete Role\n3. Delete Character\n4. Delete Map\n5. Delete Mode\n6. Delete Game Performance Detail')
         delete_choice = int(input('Enter ==> '))
         if delete_choice == 1:
-            username = input('Enter New Player Username ==> ')
-            delete_player(db=players, username=username)
+            print('1. Delete by Player ID\n2. Delete by Username')
+            delete_choice = int(input('Enter == > '))
+            if delete_choice == 1:
+                id = input('Enter New Player ID ==> ')
+                delete_player(db=players, id = id, username='')
+            elif delete_choice == 2:
+                username = input('Enter New Player Username ==> ')
+                delete_player(db=players, id = '', username=username)
             pause = getpass.getpass('Hit Enter to Advance to Main Menu...')
         elif delete_choice == 2:
             print()
@@ -169,7 +184,10 @@ while menu_1!= 4:
             elif player_view == 3:
                 username = input('Enter Player Username ==>')
                 print(view_player(db=players, id='', username=username))
+            else:
+                print('Invalid Option...\nReturning to Main Menu')
             pause = getpass.getpass('Hit Enter to Advance to Main Menu...')
+            
         elif view_choice == 2:
             print()
         elif view_choice == 3:
@@ -183,6 +201,13 @@ while menu_1!= 4:
 
     elif menu_1 == 4:
         print('Exiting...\nThank you for using our Marvels Rivals API!')
+
+    roles = pd.read_csv(roles_path)
+    characters = pd.read_csv(characters_path)
+    players = pd.read_csv(players_path)
+    maps = pd.read_csv(maps_path)
+    gamemodes = pd.read_csv(gamemodes_path)
+    game_detail = pd.read_csv(gameDetail_path)
 
     
 
