@@ -1,0 +1,4 @@
+player_id,role_id,char_id,map_id,kills,assists,deaths,win,loss
+p0001,r001,c002,m002,11,3,12,1,0
+p0002,r002,c009,m002,24,5,5,1,0
+p0003,r003,c020,m002,24,5,5,1,0
