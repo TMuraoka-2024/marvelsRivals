@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marvel Rivals Player Stats</title>
+</head>
+<body>
+    <h1>Welcome to Marvel Rivals Player Stats</h1>
+    
+    <form method="POST" action="/view_stats">
+        <label for="lookup_type">Select Lookup Type:</label><br>
+        <input type="radio" name="lookup_type" value="id" required> Lookup by Player ID<br>
+        <input type="radio" name="lookup_type" value="username" required> Lookup by Player Username<br><br>
+
+        <label for="player_id">Enter Player ID:</label><br>
+        <input type="text" id="player_id" name="player_id"><br><br>
+
+        <label for="username">Enter Player Username:</label><br>
+        <input type="text" id="username" name="username"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if player_stats %}
+    <h2>Player Stats</h2>
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Kills</th>
+            <th>Solo Kills</th>
+            <th>Assists</th>
+            <th>Matches Played</th>
+            <th>Kills per Game</th>
+            <th>Solo Kills per Game</th>
+            <th>Wins</th>
+            <th>Win/Loss %</th>
+            <th>Damage</th>
+            <th>Damage per Game</th>
+            <th>Damage Blocked</th>
+            <th>Damage Blocked per Game</th>
+            <th>Healing</th>
+            <th>Healing per Game</th>
+        </tr>
+        {% for row in player_stats.values %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>{{ row[8] }}</td>
+            <td>{{ row[9] }}</td>
+            <td>{{ row[10] }}</td>
+            <td>{{ row[11] }}</td>
+            <td>{{ row[12] }}</td>
+            <td>{{ row[13] }}</td>
+            <td>{{ row[14] }}</td>
+            <td>{{ row[15] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% elif message %}
+    <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>
